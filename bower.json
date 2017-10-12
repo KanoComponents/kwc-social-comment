@@ -1,0 +1,22 @@
+{
+  "name": "kwc-social-comment",
+  "description": "Comment feed for use in social media flavoured components",
+  "main": "kwc-social-comment.html",
+  "dependencies": {
+    "iron-image": "^2.1.2",
+    "iron-autogrow-textarea": "^2.1.0",
+    "kwc-icons": "git@github.com:KanoComponents/kwc-icons.git#v1.x",
+    "kwc-style": "git@github.com:KanoComponents/kwc-style.git#v1.x",
+    "polymer": "Polymer/polymer#^1.9.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "Polymer/web-component-tester#^6.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "resolutions": {
+    "iron-icon": "^2.0.1",
+    "iron-iconset-svg": "^2.1.0"
+  }
+}
