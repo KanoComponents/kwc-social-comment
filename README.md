@@ -1,9 +1,9 @@
-# \<kwc-social-comment\>
+# \<kwc-social-comments\>
 
 Comment feed for use in social media flavoured components
 
  - What is it called?
-     - kwc-social-comment
+     - kwc-social-comments
  - What is it made out of?
      - Describe here the contents of this component
  - What variants are needed?

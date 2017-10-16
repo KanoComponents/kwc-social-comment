@@ -7,13 +7,13 @@
 <link rel="import" href="../kwc-style/kwc-style.html">
 
 <!--
-`kwc-social-comment`
+`kwc-social-comments`
 Comment feed for use in social media flavoured components
 
 @demo demo/index.html
 -->
 
-<dom-module id="kwc-social-comment">
+<dom-module id="kwc-social-comments">
     <template>
         <style>
             :host {
@@ -272,7 +272,7 @@ Comment feed for use in social media flavoured components
                 </div>
                 <div class="actions">
                     <button type="button" class$="[[_computeFlagClass(comment.flags.*)]]" on-tap="_flagButtonTapped">
-                        <iron-icon class="icon" icon="kwc-ui-icons:flag"></iron-icon>
+                        <iron-icon class="icon" icon="social-icons:flag"></iron-icon>
                     </button>
                 </div>
                 <button id="retry" on-tap="_retryButtonTapped" hidden$="[[!comment.error]]" class="error">retry</button>
@@ -282,7 +282,7 @@ Comment feed for use in social media flavoured components
     </template>
     <script>
         Polymer({
-            is: 'kwc-social-comment',
+            is: 'kwc-social-comments',
             properties: {
                 avatar: {
                     type: String,
@@ -302,14 +302,14 @@ Comment feed for use in social media flavoured components
                 itemId: {
                     type: String
                 },
-                pageNumber: {
+                nextPage: {
                     type: Number,
                     value: 0,
                     observer: '_onDataLoad'
                 },
                 placeholder: {
                     type: String,
-                    computed: '_computePlaceholder(comments.*)'
+                    computed: '_computePlaceholder(comments)'
                 },
                 loaderStatus: {
                     type: String,
@@ -333,7 +333,7 @@ Comment feed for use in social media flavoured components
                 return user.avatar.urls.character || this.defaultAvatar;
             },
             _onDataLoad() {
-                if (this.pageNumber === null) {
+                if (this.nextPage === null) {
                     this.set('loaderStatus', 'off');
                 } else {
                     this.$.loader.disabled = false;
@@ -342,12 +342,12 @@ Comment feed for use in social media flavoured components
             },
             _loadMoreData(e) {
                 // When we hit the last page
-                if (this.pageNumber === null || !this.itemId) {
+                if (this.nextPage === null || !this.itemId) {
                     return;
                 }
                 this.$.loader.disabled = true;
                 this.set('loaderStatus', 'hide');
-                this.fire('load-comment', { id: this.itemId, page: this.pageNumber });
+                this.fire('load-comment', { id: this.itemId, page: this.nextPage });
             },
             _createDate(formatted) {
                 return new Date(formatted);
