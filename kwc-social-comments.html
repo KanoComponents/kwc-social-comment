@@ -293,6 +293,9 @@ Comment feed for use in social media flavoured components
                 },
                 comments: {
                     type: Array,
+                    value: () => {
+                        return [];
+                    },
                     notify: true
                 },
                 defaultAvatar: {
@@ -333,6 +336,9 @@ Comment feed for use in social media flavoured components
                 return user.avatar.urls.character || this.defaultAvatar;
             },
             _onDataLoad() {
+                if (this.comments){
+                    this.notifySplices('comments', []);
+                }
                 if (this.nextPage === null) {
                     this.set('loaderStatus', 'off');
                 } else {
