@@ -3,7 +3,8 @@
 <link rel="import" href="../iron-autogrow-textarea/iron-autogrow-textarea.html">
 <link rel="import" href="../iron-image/iron-image.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
-<link rel="import" href="../kwc-icons/kwc-ui-icons.html">
+<link rel="import" href="../kwc-icons/kwc-social-icons.html">
+<link rel="import" href="../kwc-button/kwc-button.html">
 <link rel="import" href="../kwc-style/kwc-style.html">
 
 <!--
@@ -27,7 +28,7 @@ Comment feed for use in social media flavoured components
                 visibility: hidden;
             }
 
-            [hidden] {
+            :host([hidden]) {
                 display: none !important;
             }
 
@@ -56,17 +57,16 @@ Comment feed for use in social media flavoured components
                 margin-right: 10px;
                 overflow: hidden;
                 position: relative;
-                transform: translateZ(0);
                 width: 40px;
             }
 
             .avatar {
                 background-color: var(--color-sky);
-                height: 80px;
-                position: absolute;
-                top: 5px;
-                transform: translateZ(0);
+                height: 43px;
                 width: 40px;
+                position: absolute;
+                top: -2px;
+                cursor: pointer;
             }
 
             .comment .avatar {
@@ -115,16 +115,12 @@ Comment feed for use in social media flavoured components
                 font-size: 16px;
                 font-family: var(--font-body);
                 color: var(--color-abbey);
-                max-width: 450px;
+                max-width: 50vw;
             }
 
             .comment-header {
                 margin: 0;
                 padding-bottom: 8px;
-            }
-
-            .content p b {
-                margin-right: 6px;
             }
 
             .content p {
@@ -136,12 +132,12 @@ Comment feed for use in social media flavoured components
             .content .date {
                 font-size: 14px;
                 font-family: var(--font-body);
-                color: var(--color-grey);
+                color: var(--color-stone);
             }
 
             p {
                 font-family: var(--font-body);
-                color: var(--color-abbey);
+                color: var(--color-chateau);
                 font-size: 16px;
                 word-wrap: break-word;
             }
@@ -149,9 +145,12 @@ Comment feed for use in social media flavoured components
             .comment-body {
                 color: var(--color-black);
             }
+            .comment:hover .action.flag{
+                visibility: visible;
+            }
 
             .author {
-                color: var(--color-kano-orange);
+                color: var(--color-grey);
                 cursor: pointer;
                 font-weight: bold;
                 margin-right: 5px;
@@ -174,7 +173,7 @@ Comment feed for use in social media flavoured components
                 border-radius: 3px;
                 color: var(--color-grey);
                 cursor: pointer;
-                transition: 0.3s ease;
+                visibility: hidden;
             }
 
             .action.flag:hover {
@@ -190,6 +189,11 @@ Comment feed for use in social media flavoured components
                 height: 16px;
                 width: 16px;
             }
+            #retry {
+                margin-top: 10px;
+                line-height: 15px;
+                height:25px;
+            }
 
             h3[shown] {
                 color: var(--color-grey);
@@ -202,34 +206,11 @@ Comment feed for use in social media flavoured components
             }
 
             .loader {
-                @apply --kano-round-button;
                 margin-top: 20px;
-                text-align: center;
-            }
-
-            .loader:hover {
-                background-color: var(--color-sushi);
             }
 
             .loader[hidden] {
                 display: block;
-            }
-
-            .error {
-                @apply --kano-button;
-                background: var(--color-red);
-                padding: 8px;
-                width: 80px;
-                text-align: center;
-            }
-
-            :host([loader-status="on"]) #loader {
-                background-color: var(--color-grassland);
-                color: white;
-            }
-
-            :host([loader-status="on"]) #loader:hover {
-                background-color: var(--color-sushi);
             }
 
             :host([loader-status="off"]) #loader {
@@ -241,49 +222,80 @@ Comment feed for use in social media flavoured components
                 color: rgba(41, 47, 53, 1);
             }
 
+            kwc-button[hidden] {
+                display: none;
+            }
             :host([retry-button="hide"]) #retry {
                 display: none;
             }
         </style>
         <div class="input-comment">
             <div class="comment-avatar">
-                <iron-image class="avatar" src$="[[avatar]]" sizing="cover" preload fade>
-                </iron-image>
+                <iron-image class="avatar"
+                            src$="[[_avatar]]"
+                            sizing="cover"
+                            preload fade>
+                            </iron-image>
             </div>
             <form class="comment-form" on-submit="_submitComment">
-                <input class="comment-box" type="text" placeholder$="[[placeholder]]" value="{{comment::input}}" />
+                <input class="comment-box"
+                       type="text"
+                       placeholder$="[[placeholderText]]"
+                       value="{{comment::input}}"/>
             </form>
         </div>
         <template is="dom-repeat" items="[[comments]]" as="comment">
             <div class$="comment [[_computePostingClass(comment.posting)]]">
                 <div class="comment-avatar">
-                    <iron-image class="avatar" src$="[[_computeAvatar(comment.author)]]" sizing="cover" preload fade on-tap="_userTapped">
-                    </iron-image>
+                    <iron-image class="avatar"
+                                src$="[[_computeAvatar(comment.author)]]"
+                                sizing="cover"
+                                preload fade
+                                on-tap="_userTapped">
+                                </iron-image>
                 </div>
                 <div class="content">
                     <p class="comment-header">
-                        <span class="author" on-tap="_userTapped">{{comment.author.username}}</span>
-                        <span class="date">[[_timeSince(comment.date_created, comments.*)]] ago</span>
+                        <span class="author"
+                              on-tap="_userTapped">
+                            {{comment.author.username}}
+                        </span>
+                        <span class="date">
+                            [[_timeSince(comment.date_created, comments.*)]] ago
+                        </span>
                     </p>
                     <p class="comment-body">
                         <span inner-h-t-m-l="[[_lb(comment.text)]]"></span>
                     </p>
                 </div>
                 <div class="actions">
-                    <button type="button" class$="[[_computeFlagClass(comment.flags.*)]]" on-tap="_flagButtonTapped">
-                        <iron-icon class="icon" icon="social-icons:flag"></iron-icon>
+                    <button type="button"
+                            class$="[[_computeFlagClass(comment.flags.*)]]"
+                            on-tap="_flagButtonTapped">
+                        <iron-icon class="icon" icon="kwc-social-icons:flag"></iron-icon>
                     </button>
+                    <kwc-button id="retry"
+                            on-tap="_retryButtonTapped"
+                            hidden$="[[!comment.error]]"
+                            type="warning"
+                            transparent>
+                        retry
+                    </kwc-button>
                 </div>
-                <button id="retry" on-tap="_retryButtonTapped" hidden$="[[!comment.error]]" class="error">retry</button>
             </div>
         </template>
-        <button class="loader" id="loader" on-tap="_loadMoreData">Load more</button>
+        <kwc-button class="loader"
+                    id="loader" 
+                    type="secondary"
+                    on-tap="_loadMoreData">
+            Load more
+        </kwc-button>
     </template>
     <script>
         Polymer({
             is: 'kwc-social-comments',
             properties: {
-                avatar: {
+                _avatar: {
                     type: String,
                     computed: '_computeAvatar(user)'
                 },
@@ -299,7 +311,7 @@ Comment feed for use in social media flavoured components
                 },
                 defaultAvatar: {
                     type: String,
-                    value: 'https://s3.amazonaws.com/kano-avatars/judoka-standard.png'
+                    value: 'https://s3.amazonaws.com/kano-avatars/default-avatar.svg'
                 },
                 itemId: {
                     type: String
@@ -309,9 +321,9 @@ Comment feed for use in social media flavoured components
                     value: 0,
                     observer: '_onDataLoad'
                 },
-                placeholder: {
+                placeholderText: {
                     type: String,
-                    computed: '_computePlaceholder(comments)'
+                    computed: '_computePlaceholderText(comments)'
                 },
                 loaderStatus: {
                     type: String,
@@ -320,9 +332,6 @@ Comment feed for use in social media flavoured components
                 retryButton: {
                     type: String,
                     reflectToAttribute: true
-                },
-                sharedByUser: {
-                    type: Boolean
                 },
                 user: {
                     type: Object,
@@ -335,10 +344,10 @@ Comment feed for use in social media flavoured components
                 if (!user || !user.avatar || !user.avatar.urls) {
                     return this.defaultAvatar;
                 }
-                return user.avatar.urls.character || this.defaultAvatar;
+                return user.avatar.urls.circle || this.defaultAvatar;
             },
             _onDataLoad() {
-                if (this.nextPage === null) {
+                if (!this.nextPage) {
                     this.set('loaderStatus', 'off');
                 } else {
                     this.$.loader.disabled = false;
@@ -347,12 +356,19 @@ Comment feed for use in social media flavoured components
             },
             _loadMoreData(e) {
                 // When we hit the last page
-                if (this.nextPage === null || !this.itemId) {
+                if (this.nextPage === null
+                    || !this.itemId
+                    || this.$.loader.disabled) {
                     return;
                 }
                 this.$.loader.disabled = true;
                 this.set('loaderStatus', 'hide');
-                this.fire('load-comment', { id: this.itemId, page: this.nextPage });
+                this.dispatchEvent(new CustomEvent('load-comment', {
+                    detail: {
+                        id: this.itemId,
+                        page: this.nextPage
+                    }
+                }));
             },
             _createDate(formatted) {
                 return new Date(formatted);
@@ -370,13 +386,11 @@ Comment feed for use in social media flavoured components
                     activeClass = this._computeFlag(splice.base) ? 'flagged' : 'unflagged';
                 return `${baseClass} ${activeClass}`;
             },
-            _computePlaceholder(comments) {
-                let defaultCopy = 'Leave a comment',
-                    emptyCopy = 'Be the first to comment';
-                if (!comments || !comments.base) {
-                    return defaultCopy;
+            _computePlaceholderText(comments) {
+                if (!comments.length) {
+                    return 'Be the first to comment';
                 }
-                return comments.base.length ? defaultCopy : emptyCopy;
+                return 'Leave a comment';
             },
             _computePostingClass(posting) {
                 return posting ? 'posting' : '';
@@ -399,18 +413,29 @@ Comment feed for use in social media flavoured components
                 if (flaged) {
                     return;
                 }
-                this.fire('flag-comment', {
-                    index,
-                    id
-                });
+                this.dispatchEvent(new CustomEvent('flag-comment', {
+                    detail: {
+                        index,
+                        id
+                    }
+                }));
             },
             _retryButtonTapped() {
                 this.set('retryButton', 'hide');
-                this.fire('post-comment', { value: this.comments[0].text, retry: true });
+                this.dispatchEvent(new CustomEvent('post-comment', { 
+                    detail: {
+                        value: this.comments[0].text,
+                        retry: true
+                    }
+                }));
             },
             _submitComment(e) {
                 e.preventDefault();
-                this.fire('post-comment', { value: this.comment });
+                this.dispatchEvent(new CustomEvent('post-comment', {
+                    detail: {
+                        value: this.comment
+                    }
+                }));
                 this.comment = '';
             },
             _timeSince(date) {
@@ -441,7 +466,11 @@ Comment feed for use in social media flavoured components
             _userTapped(e) {
                 let index = e.model.index,
                     author = this.comments[index].author;
-                this.fire('view-user', { id: author.id });
+                this.dispatchEvent(new CustomEvent('view-user', {
+                    detail: {
+                        id: author.id
+                    }
+                }));
             }
         });
     </script>

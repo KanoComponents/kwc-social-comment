@@ -5,6 +5,7 @@
   "dependencies": {
     "iron-image": "^2.1.2",
     "iron-autogrow-textarea": "^2.1.0",
+    "kwc-button": "git@github.com:KanoComponents/kwc-button.git#v1.x",
     "kwc-icons": "git@github.com:KanoComponents/kwc-icons.git#v1.x",
     "kwc-style": "git@github.com:KanoComponents/kwc-style.git#v1.x",
     "polymer": "Polymer/polymer#^1.9.0"
