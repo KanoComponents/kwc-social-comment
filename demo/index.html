@@ -43,6 +43,7 @@
                         const comment = document.querySelector('#share-comment');
                         comment.comments = MANY_COMMENTS.entries;
                         comment.nextPage = MANY_COMMENTS.next;
+                        comment.loaderStatus = "on";
                         comment.addEventListener('flag-comment', function(e){
                             alert(`You flagged comment ${e.detail.index} with id ${e.detail.id}`);
                         });
@@ -53,7 +54,8 @@
                             alert(`You clicked on the user with id "${e.detail.id}"`);
                         });
                         comment.addEventListener('load-comment', function(e){
-                            alert(`You clicked item id "${e.detail.id}" to load page ${e.detail.page} comments`);
+                            alert(`You clicked item id "${e.detail.id}" to load more comments`);
+                            comment.loaderStatus = "disabled";
                         });
                     });
                 </script>
@@ -88,27 +90,19 @@
                         const comment = document.querySelector('#comment-load');
                         comment.comments = LOAD_COMMENTS.entries;
                         comment.nextPage = LOAD_COMMENTS.next;
+                        comment.loaderStatus = "on";
                         comment.addEventListener('load-comment', function(e){
                             LOAD_COMMENTS.entries.push({
                                 "id": "597f5855ab262e3b0c6d80dc",
                                 "author": {
                                     "id": "597f01977fd88c3b0bfeec62",
-                                    "username": "jonas17",
-                                    "joined": "2017-07-31T10:08:23.509Z",
-                                    "avatar": {
-                                        "urls": {
-                                            "circle": null,
-                                            "landscape": null,
-                                            "character": null
-                                        }
-                                    },
+                                    "username": "jonas17"
                                 },
                                 "text": "I keep on writing comments",
                                 "date_created": "2017-07-31T16:18:29.067Z",
-                                "flags": [],
-                                "spam": false
+                                "flags": []
                             });
-                            comment.nextPage = 0;
+                            comment.loaderStatus = "off";
                             comment.notifySplices('comments', [
                             { index: 2, removed: [], addedCount: 1, object: LOAD_COMMENTS.entries, type: 'splice' }
                             ]);
@@ -126,12 +120,7 @@
                     "author": {
                         "id": "549dd41e77350606001a608a",
                         "username": "DJPMcG",
-                        "joined": "2014-12-26T21:33:18.126Z",
-                        "avatar": {
-                            "urls": {
-                                "circle": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png",
-                            }
-                        },
+                        "avatar": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png"
                     },
                     "text": "@jonas98765 How did you find this version of kano world???",
                     "date_created": "2017-09-15T13:12:19.494Z",
@@ -144,13 +133,6 @@
                         "id": "597f01977fd88c3b0bfeec62",
                         "username": "jonas17",
                         "joined": "2017-07-31T10:08:23.509Z",
-                        "avatar": {
-                            "urls": {
-                                "circle": null,
-                                "landscape": null,
-                                "character": null
-                            }
-                        },
                     },
                     "text": "I keep on writing comments",
                     "date_created": "2017-07-31T16:18:29.067Z",
@@ -163,11 +145,6 @@
                         "id": "597f01977fd88c3b0bfeec62",
                         "username": "jonas17",
                         "joined": "2017-07-31T10:08:23.509Z",
-                        "avatar": {
-                            "urls": {
-                                "circle": null,
-                            }
-                        },
                     },
                     "text": "you a great.",
                     "date_created": "2017-07-31T16:18:09.218Z",
@@ -181,13 +158,6 @@
                         "username": "codebadger",
                         "admin_level": 98,
                         "joined": "2016-11-28T12:15:43.148Z",
-                        "avatar": {
-                            "urls": {
-                                "circle": null,
-                                "landscape": null,
-                                "character": null
-                            }
-                        },
                     },
                     "text": "I like looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong comments!",
                     "date_created": "2017-07-14T15:41:49.642Z",
@@ -200,13 +170,6 @@
                         "id": "595a1d757f3cfa402b912d03",
                         "username": "codebadger3005",
                         "joined": "2017-07-03T10:33:25.387Z",
-                        "avatar": {
-                            "urls": {
-                                "circle": null,
-                                "landscape": null,
-                                "character": null
-                            }
-                        },
                     },
                     "text": "Very colourful!",
                     "date_created": "2017-07-04T13:09:47.872Z",
@@ -219,11 +182,6 @@
                         "id": "595a1d757f3cfa402b912d03",
                         "username": "codebadger3005",
                         "joined": "2017-07-03T10:33:25.387Z",
-                        "avatar": {
-                            "urls": {
-                                "circle": null,
-                            }
-                        },
                     },
                     "text": "Oh hi",
                     "date_created": "2017-07-04T13:09:22.534Z",
@@ -236,11 +194,6 @@
                         "id": "595a1d757f3cfa402b912d03",
                         "username": "codebadger3005",
                         "joined": "2017-07-03T10:33:25.387Z",
-                        "avatar": {
-                            "urls": {
-                                "circle": null,
-                            }
-                        },
                     },
                     "text": "Good work",
                     "date_created": "2017-07-04T13:08:53.809Z",
@@ -253,11 +206,6 @@
                         "id": "595a1d757f3cfa402b912d03",
                         "username": "codebadger3005",
                         "joined": "2017-07-03T10:33:25.387Z",
-                        "avatar": {
-                            "urls": {
-                                "circle": null,
-                            }
-                        },
                     },
                     "text": "Jolly nice",
                     "date_created": "2017-07-04T13:08:38.785Z",
@@ -271,13 +219,6 @@
                         "username": "codebadger",
                         "admin_level": 98,
                         "joined": "2016-11-28T12:15:43.148Z",
-                        "avatar": {
-                            "urls": {
-                                "circle": null,
-                                "landscape": null,
-                                "character": null
-                            }
-                        },
                     },
                     "text": "Did you?",
                     "date_created": "2017-06-21T16:57:08.632Z",
@@ -304,11 +245,7 @@
                         "id": "549dd41e77350606001a608a",
                         "username": "DJPMcG",
                         "joined": "2014-12-26T21:33:18.126Z",
-                        "avatar": {
-                            "urls": {
-                                "circle": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png",
-                            }
-                        }
+                        "avatar": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png",
                     },
                     "text": "@jonas98765 How did you find this version of kano world???",
                     "date_created": "2017-09-15T13:12:19.494Z",
@@ -321,11 +258,7 @@
                     "author": {
                         "id": "549dd41e77350606001a608a",
                         "username": "DJPMcG",
-                        "avatar": {
-                            "urls": {
-                                "circle": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png",
-                            },
-                        }
+                        "avatar": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png",
                     },
                     "text": "@codebadger omg stop! That's SUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUPER annoying!",
                     "date_created": "2017-09-15T13:11:40.045Z",
@@ -352,11 +285,7 @@
                         "id": "549dd41e77350606001a608a",
                         "username": "DJPMcG",
                         "joined": "2014-12-26T21:33:18.126Z",
-                        "avatar": {
-                            "urls": {
-                                "circle": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png",
-                            }
-                        }
+                        "avatar": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png",
                     },
                     "text": "@jonas98765 How did you find this version of kano world???",
                     "date_created": "2017-09-15T13:12:19.494Z",
@@ -368,11 +297,7 @@
                     "author": {
                         "id": "549dd41e77350606001a608a",
                         "username": "DJPMcG",
-                        "avatar": {
-                            "urls": {
-                                "circle": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png",
-                            },
-                        }
+                        "avatar": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png",
                     },
                     "text": "@codebadger omg stop! That's SUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUPER annoying!",
                     "date_created": "2017-09-15T13:11:40.045Z",

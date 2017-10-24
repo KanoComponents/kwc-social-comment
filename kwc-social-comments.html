@@ -8,8 +8,61 @@
 <link rel="import" href="../kwc-style/kwc-style.html">
 
 <!--
-`kwc-social-comments`
-Comment feed for use in social media flavoured components
+`<kwc-social-comments>`
+
+Comment feed for use in social media flavoured components. Add this component somewhere in your html body, or more likely embed it into another comonent.
+
+```html
+    <body>
+      <kwc-social-comments></kwc-social-comments>
+```
+The component does not make any assumptions on how you are handling comment loading, or how they are stored by the api. Control of `loading` and `posting` states are done through attributes that can be set by any wrapper component.
+
+This component expects a list of comment objects of the following form:
+```json
+{
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "author": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+            }
+        },
+        "text": {
+            "type": "string"
+        },
+        "createdOn": {
+            "type": "string"
+        },
+        "flags": {
+            "type": "array",
+            "items": {}
+        },
+    },
+    "required" : ["id", "text", "createdOn"]
+}
+```
+
+## State attributes
+### Loading
+This commponent can be put into a `loading` state by setting the `loaderState` property or `loader-state` attribute to `"disabled"`. This will disable the "load more" button until the state is reset to `"on"`. 
+
+If there are no more comments to load, the "load more" button can be hidden by setting the loader state to `"off"`.
+
+### Posting
+The comment input can be disabled by setting the `posting` attribute or property on the element to `true`. This can be used to prevent a user from posting a second comment whilst the first is still being sent, if this is a desired behaviour.
 
 @demo demo/index.html
 -->
@@ -31,16 +84,6 @@ Comment feed for use in social media flavoured components
             :host([hidden]) {
                 display: none !important;
             }
-
-            h3 {
-                color: black;
-                font-size: 16px;
-                line-height: 43px;
-                font-family: var(--font-body);
-                display: none;
-                margin: 24px 0 0 0;
-            }
-
             .input-comment {
                 @apply --layout-horizontal;
                 border-bottom: 1px solid var(--color-porcelain);
@@ -48,7 +91,6 @@ Comment feed for use in social media flavoured components
                 margin: 24px 0 0 0;
                 width: 100%;
             }
-
             .comment-avatar {
                 background-color: var(--color-sky);
                 border-radius: 50%;
@@ -59,30 +101,24 @@ Comment feed for use in social media flavoured components
                 position: relative;
                 width: 40px;
             }
-
             .avatar {
-                background-color: var(--color-sky);
                 height: 43px;
                 width: 40px;
                 position: absolute;
                 top: -2px;
                 cursor: pointer;
             }
-
             .comment .avatar {
                 cursor: pointer;
             }
-
             iron-image {
                 height: 32px;
                 width: 32px;
                 border-radius: 50%;
             }
-
             .comment-form {
                 @apply --layout-flex-2;
             }
-
             .comment-box {
                 border: 1px solid var(--color-porcelain);
                 border-radius: 3px;
@@ -92,12 +128,10 @@ Comment feed for use in social media flavoured components
                 padding: 16px 16px 32px 16px;
                 width: 100%;
             }
-
             .comment-box:focus {
                 border-color: var(--color-azure);
                 outline: 0;
             }
-
             .comment {
                 @apply --layout-horizontal;
                 @apply --layout-start;
@@ -105,11 +139,9 @@ Comment feed for use in social media flavoured components
                 padding: 24px 0 16px 0;
                 width: 100%;
             }
-
             .comment.posting {
                 opacity: 0.6;
             }
-
             .content {
                 @apply --layout-flex-2;
                 font-size: 16px;
@@ -194,12 +226,6 @@ Comment feed for use in social media flavoured components
                 line-height: 15px;
                 height:25px;
             }
-
-            h3[shown] {
-                color: var(--color-grey);
-                display: block;
-            }
-
             iron-list {
                 width: 100%;
                 height: 100%
@@ -240,12 +266,13 @@ Comment feed for use in social media flavoured components
             <form class="comment-form" on-submit="_submitComment">
                 <input class="comment-box"
                        type="text"
-                       placeholder$="[[placeholderText]]"
-                       value="{{comment::input}}"/>
+                       placeholder$="[[_placeholderText]]"
+                       value="{{_comment::input}}"
+                       disabled$="[[posting]]"/>
             </form>
         </div>
         <template is="dom-repeat" items="[[comments]]" as="comment">
-            <div id$="c{{index}}" class$="comment [[_computePostingClass(comment)]]">
+            <div id$="[[comment.id]]" class$="comment [[_computePostingClass(comment)]]">
                 <div class="comment-avatar">
                     <iron-image class="avatar"
                                 src$="[[_computeAvatar(comment.author)]]"
@@ -295,13 +322,25 @@ Comment feed for use in social media flavoured components
         Polymer({
             is: 'kwc-social-comments',
             properties: {
+                /**
+                 * Computer value for avatar
+                 * @type {String}
+                 */
                 _avatar: {
                     type: String,
                     computed: '_computeAvatar(user)'
                 },
-                comment: {
+                /**
+                 * Current value for comment input
+                 * @type {String}
+                 */
+                _comment: {
                     type: String
                 },
+                 /**
+                 * Array of comment objects to render
+                 * @type {Array}
+                 */
                 comments: {
                     type: Array,
                     value: () => {
@@ -309,30 +348,68 @@ Comment feed for use in social media flavoured components
                     },
                     notify: true
                 },
+                /**
+                 * Default Avatar to use when not provided by comment or user data
+                 * @type {String}
+                 */
                 defaultAvatar: {
                     type: String,
                     value: 'https://s3.amazonaws.com/kano-avatars/default-avatar.svg'
                 },
+                /**
+                 * An identifier to this comment thread, to be used in the `post-comment` event.
+                 * @type {String}
+                 */
                 itemId: {
                     type: String
                 },
+                /**
+                 * Value of next page of comments if using pagination.
+                 * @type {Number}
+                 */
                 nextPage: {
                     type: Number,
                     value: 0,
                     observer: '_onDataLoad'
                 },
-                placeholderText: {
+                /**
+                 * Text to use as placeholder. Computed on whether we have comments or not.
+                 * @type {String}
+                 */
+                _placeholderText: {
                     type: String,
                     computed: '_computePlaceholderText(comments)'
                 },
+                /**
+                 * Atribute to indicate a comment is being posted. Will disable input.
+                 * @type {Boolean}
+                 */
+                posting: {
+                    type: Boolean,
+                    value: false
+                },
+                /**
+                 * Atribute to loader status of the compnent. 
+                 * Can be one of `on|off|disabled`. Will disable (disabled) or hide (off) load button.
+                 * @type {String}
+                 */
                 loaderStatus: {
                     type: String,
+                    value: "off",
                     reflectToAttribute: true
                 },
+                /**
+                 * Atribute used to hide the retry button once clicked.
+                 * @type {Boolean}
+                 */
                 retryButton: {
                     type: String,
                     reflectToAttribute: true
                 },
+                /**
+                 * Current authenticated user. 
+                 * @type {String}
+                 */
                 user: {
                     type: Object,
                     value: () => {
@@ -341,32 +418,22 @@ Comment feed for use in social media flavoured components
                 }
             },
             _computeAvatar(user) {
-                if (!user || !user.avatar || !user.avatar.urls) {
-                    return this.defaultAvatar;
+                if (user) {
+                    return user.avatar || this.defaultAvatar;
                 }
-                return user.avatar.urls.circle || this.defaultAvatar;
+                return this.defaultAvatar;
             },
             _onDataLoad() {
-                if (!this.nextPage) {
-                    this.set('loaderStatus', 'off');
-                } else {
-                    this.$.loader.disabled = false;
-                    this.set('loaderStatus', 'on');
-                }
+                this.$.loader.disabled = false;
             },
-            _loadMoreData(e) {
-                // When we hit the last page
-                if (this.nextPage === null
-                    || !this.itemId
-                    || this.$.loader.disabled) {
+            _loadMoreData() {
+                if (!this.itemId || this.$.loader.disabled) {
                     return;
                 }
                 this.$.loader.disabled = true;
-                this.set('loaderStatus', 'hide');
                 this.dispatchEvent(new CustomEvent('load-comment', {
                     detail: {
-                        id: this.itemId,
-                        page: this.nextPage
+                        id: this.itemId
                     }
                 }));
             },
@@ -409,6 +476,13 @@ Comment feed for use in social media flavoured components
                 safeDiv.textContent = value;
                 return safeDiv.innerHTML.replace(/\n/g, '<br>');
             },
+            /**
+            * Fired when flag icon is pressed on an individual comment.
+            *
+            * @event flag-comment
+            * @param {string} index Index in comments array.
+            * @param {string} id Id of comment as given by comment object.
+            */
             _flagButtonTapped(e) {
                 let index = e.model.index,
                     id = this.comments[index].id,
@@ -423,6 +497,13 @@ Comment feed for use in social media flavoured components
                     }
                 }));
             },
+            /**
+            * Fired when retry is clicked on an individual comment that has errored.
+            *
+            * @event post-comment
+            * @param {string} value Comment text.
+            * @param {boolean} retry Flag to indicate the post is a retry.
+            */
             _retryButtonTapped() {
                 this.set('retryButton', 'hide');
                 this.dispatchEvent(new CustomEvent('post-comment', { 
@@ -432,14 +513,20 @@ Comment feed for use in social media flavoured components
                     }
                 }));
             },
+            /**
+            * Fired when new comment is submited.
+            *
+            * @event post-comment
+            * @param {string} value Comment text.
+            */
             _submitComment(e) {
                 e.preventDefault();
                 this.dispatchEvent(new CustomEvent('post-comment', {
                     detail: {
-                        value: this.comment
+                        value: this._comment
                     }
                 }));
-                this.comment = '';
+                this._comment = '';
             },
             _timeSince(date) {
                 let parsedDate = new Date(date),
@@ -466,14 +553,22 @@ Comment feed for use in social media flavoured components
                 }
                 return Math.floor(seconds) + ' seconds';
             },
+            /**
+            * Fired when the user icon or name is tapped on an individual comment.
+            *
+            * @event view-user
+            * @param {string} id provided by the `comment.author.id` property.
+            */
             _userTapped(e) {
                 let index = e.model.index,
                     author = this.comments[index].author;
-                this.dispatchEvent(new CustomEvent('view-user', {
-                    detail: {
-                        id: author.id
-                    }
-                }));
+                if (author) {
+                    this.dispatchEvent(new CustomEvent('view-user', {
+                        detail: {
+                            id: author.id
+                        }
+                    }));
+                }
             }
         });
     </script>
