@@ -77,6 +77,46 @@
                 </script>
             </template>
         </demo-snippet>
+        <h3>Loading next page</h3>
+        <demo-snippet>
+            <template>
+                <kwc-social-comments id="comment-load"
+                                     item-id="59496a0d95c8344bcf3246ad">
+                                    </kwc-social-comments>
+                <script>
+                    document.addEventListener('WebComponentsReady', function () {
+                        const comment = document.querySelector('#comment-load');
+                        comment.comments = LOAD_COMMENTS.entries;
+                        comment.nextPage = LOAD_COMMENTS.next;
+                        comment.addEventListener('load-comment', function(e){
+                            LOAD_COMMENTS.entries.push({
+                                "id": "597f5855ab262e3b0c6d80dc",
+                                "author": {
+                                    "id": "597f01977fd88c3b0bfeec62",
+                                    "username": "jonas17",
+                                    "joined": "2017-07-31T10:08:23.509Z",
+                                    "avatar": {
+                                        "urls": {
+                                            "circle": null,
+                                            "landscape": null,
+                                            "character": null
+                                        }
+                                    },
+                                },
+                                "text": "I keep on writing comments",
+                                "date_created": "2017-07-31T16:18:29.067Z",
+                                "flags": [],
+                                "spam": false
+                            });
+                            comment.nextPage = 0;
+                            comment.notifySplices('comments', [
+                            { index: 2, removed: [], addedCount: 1, object: LOAD_COMMENTS.entries, type: 'splice' }
+                            ]);
+                        });
+                    });
+                </script>
+            </template>
+        </demo-snippet>
     </div>
     <script>
         const MANY_COMMENTS = {
@@ -275,6 +315,53 @@
                     "flags": [],
                     "spam": false,
                     "error":true
+                },
+                {
+                    "id": "59bbd18cbadf002262db32ab",
+                    "author": {
+                        "id": "549dd41e77350606001a608a",
+                        "username": "DJPMcG",
+                        "avatar": {
+                            "urls": {
+                                "circle": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png",
+                            },
+                        }
+                    },
+                    "text": "@codebadger omg stop! That's SUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUPER annoying!",
+                    "date_created": "2017-09-15T13:11:40.045Z",
+                    "flags": [],
+                    "spam": false
+                }
+            ],
+            "total": 14,
+            "pages": 0,
+            "page": 0,
+            "previous": null,
+            "next": 1,
+            "display": {
+                "page": 1,
+                "previous": 1,
+                "next": 1
+            }
+        },
+        LOAD_COMMENTS = {
+            "entries": [
+                {
+                    "id": "59bbd1b3badf002262db32ae",
+                    "author": {
+                        "id": "549dd41e77350606001a608a",
+                        "username": "DJPMcG",
+                        "joined": "2014-12-26T21:33:18.126Z",
+                        "avatar": {
+                            "urls": {
+                                "circle": "https://s3-eu-west-1.amazonaws.com/world.kano.me/users/avatars/549dd41e77350606001a608a/avatar-circle.png",
+                            }
+                        }
+                    },
+                    "text": "@jonas98765 How did you find this version of kano world???",
+                    "date_created": "2017-09-15T13:12:19.494Z",
+                    "flags": [],
+                    "spam": false
                 },
                 {
                     "id": "59bbd18cbadf002262db32ab",
