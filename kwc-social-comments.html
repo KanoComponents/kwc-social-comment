@@ -115,7 +115,7 @@ Comment feed for use in social media flavoured components
                 font-size: 16px;
                 font-family: var(--font-body);
                 color: var(--color-abbey);
-                max-width: 50vw;
+                max-width: calc(85% - 40px);
             }
 
             .comment-header {
@@ -148,7 +148,6 @@ Comment feed for use in social media flavoured components
             .comment:hover .action.flag{
                 visibility: visible;
             }
-
             .author {
                 color: var(--color-grey);
                 cursor: pointer;
@@ -157,9 +156,10 @@ Comment feed for use in social media flavoured components
             }
 
             .actions {
-                @apply --layout-start;
+                @apply --layout-end;
                 @apply --layout-vertical;
                 flex: none;
+                width: calc(15% - 40px);
             }
 
             .action:focus {
@@ -245,7 +245,7 @@ Comment feed for use in social media flavoured components
             </form>
         </div>
         <template is="dom-repeat" items="[[comments]]" as="comment">
-            <div class$="comment [[_computePostingClass(comment.posting)]]">
+            <div id$="c{{index}}" class$="comment [[_computePostingClass(comment)]]">
                 <div class="comment-avatar">
                     <iron-image class="avatar"
                                 src$="[[_computeAvatar(comment.author)]]"
@@ -392,8 +392,11 @@ Comment feed for use in social media flavoured components
                 }
                 return 'Leave a comment';
             },
-            _computePostingClass(posting) {
-                return posting ? 'posting' : '';
+            _computePostingClass(comment) {
+                return `${comment.posting ? 'posting' : ''}${comment.error ? 'error' : ''}`;
+            },
+            _computeErrorClass(error) {
+                return error ? 'error' : '';
             },
             _computeErrorState(error) {
                 return error ? true : '';
