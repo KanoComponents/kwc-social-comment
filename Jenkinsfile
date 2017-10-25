@@ -20,9 +20,7 @@ pipeline {
                     sh "bower --version || npm i -g bower"
                     sh "polymer --version || npm i -g polymer-cli"
                     sh "npm install -g https://github.com/marcelmeulemans/wct-junit-reporter.git"
-                    sh "rm -rf bower_components/"
-                    sh "bower cache clean"
-                    sh "bower i"
+                    sh "bower update"
                 }
             }
         }

@@ -454,7 +454,7 @@ The comment input can be disabled by setting the `posting` attribute or property
                 return `${baseClass} ${activeClass}`;
             },
             _computePlaceholderText(comments) {
-                if (!comments.length) {
+                if (!comments || comments.length) {
                     return 'Be the first to comment';
                 }
                 return 'Leave a comment';
