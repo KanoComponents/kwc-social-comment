@@ -442,7 +442,7 @@ The comment input can be disabled by setting the `posting` attribute or property
                 return new Date(formatted);
             },
             _computeFlag(flags) {
-                if (!flags) {
+                if (!flags || !this.user) {
                     return false;
                 }
                 return flags.some(flag => {
@@ -455,7 +455,7 @@ The comment input can be disabled by setting the `posting` attribute or property
                 return `${baseClass} ${activeClass}`;
             },
             _computePlaceholderText(comments) {
-                if (!comments || comments.length) {
+                if (!comments || !comments.length) {
                     return 'Be the first to comment';
                 }
                 return 'Leave a comment';
