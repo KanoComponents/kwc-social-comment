@@ -566,7 +566,8 @@ The comment input can be disabled by setting the `posting` attribute or property
                 if (author) {
                     this.dispatchEvent(new CustomEvent('view-user', {
                         detail: {
-                            id: author.id
+                            id: author.id,
+                            username: author.username
                         }
                     }));
                 }
