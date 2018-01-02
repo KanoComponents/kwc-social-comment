@@ -57,7 +57,7 @@ This component expects a list of comment objects of the following form:
 
 ## State attributes
 ### Loading
-This commponent can be put into a `loading` state by setting the `loaderState` property or `loader-state` attribute to `"disabled"`. This will disable the "load more" button until the state is reset to `"on"`. 
+This commponent can be put into a `loading` state by setting the `loaderState` property or `loader-state` attribute to `"disabled"`. This will disable the "load more" button until the state is reset to `"on"`.
 
 If there are no more comments to load, the "load more" button can be hidden by setting the loader state to `"off"`.
 
@@ -76,11 +76,9 @@ The comment input can be disabled by setting the `posting` attribute or property
                 @apply --layout-justified;
                 width: 100%;
             }
-
             :host([tombstone]) * {
                 visibility: hidden;
             }
-
             :host([hidden]) {
                 display: none !important;
             }
@@ -96,16 +94,14 @@ The comment input can be disabled by setting the `posting` attribute or property
                 border-radius: 50%;
                 flex: none;
                 height: 40px;
-                margin-right: 10px;
+                margin: 0 24px;
                 overflow: hidden;
                 position: relative;
                 width: 40px;
             }
             .avatar {
-                height: 43px;
+                height: 40px;
                 width: 40px;
-                position: absolute;
-                top: -2px;
                 cursor: pointer;
             }
             .comment .avatar {
@@ -136,7 +132,7 @@ The comment input can be disabled by setting the `posting` attribute or property
                 @apply --layout-horizontal;
                 @apply --layout-start;
                 border-bottom: 1px solid var(--color-porcelain);
-                padding: 24px 0 16px 0;
+                padding: 24px 0;
                 width: 100%;
             }
             .comment.posting {
@@ -149,31 +145,26 @@ The comment input can be disabled by setting the `posting` attribute or property
                 color: var(--color-abbey);
                 max-width: 450px;
             }
-
             .comment-header {
                 margin: 0;
                 padding-bottom: 8px;
             }
-
             .content p {
                 margin: 0;
                 padding-bottom: 8px;
                 width: 100%;
             }
-
             .content .date {
                 font-size: 14px;
                 font-family: var(--font-body);
-                color: var(--color-stone);
+                color: var(--color-grey);
             }
-
             p {
                 font-family: var(--font-body);
                 color: var(--color-chateau);
                 font-size: 16px;
                 word-wrap: break-word;
             }
-
             .comment-body {
                 color: var(--color-black);
             }
@@ -181,23 +172,20 @@ The comment input can be disabled by setting the `posting` attribute or property
                 visibility: visible;
             }
             .author {
-                color: var(--color-grey);
+                color: var(--color-kano-orange);
                 cursor: pointer;
                 font-weight: bold;
                 margin-right: 5px;
             }
-
             .actions {
                 @apply --layout-end;
                 @apply --layout-vertical;
                 flex: none;
                 width: calc(15% - 40px);
             }
-
             .action:focus {
                 outline: 0;
             }
-
             .action.flag {
                 -webkit-appearance: none;
                 background: transparent;
@@ -207,17 +195,14 @@ The comment input can be disabled by setting the `posting` attribute or property
                 cursor: pointer;
                 visibility: hidden;
             }
-
             .action.flag:hover {
                 color: var(--color-carnation);
             }
-
             .action.flag.flagged {
                 color: var(--color-carnation);
                 cursor: default;
                 visibility: visible;
             }
-
             .action.flag .icon {
                 height: 16px;
                 width: 16px;
@@ -231,24 +216,19 @@ The comment input can be disabled by setting the `posting` attribute or property
                 width: 100%;
                 height: 100%
             }
-
             .loader {
                 margin-top: 20px;
             }
-
             .loader[hidden] {
                 display: block;
             }
-
             :host([loader-status="off"]) #loader {
                 display: none;
             }
-
             :host([loader-status="disabled"]) #loader {
                 background-color: var(--color-porcelain);
                 color: rgba(41, 47, 53, 1);
             }
-
             kwc-button[hidden] {
                 display: none;
             }
@@ -313,7 +293,7 @@ The comment input can be disabled by setting the `posting` attribute or property
             </div>
         </template>
         <kwc-button class="loader"
-                    id="loader" 
+                    id="loader"
                     type="secondary"
                     on-tap="_loadMoreData">
             Load more
@@ -390,7 +370,7 @@ The comment input can be disabled by setting the `posting` attribute or property
                     value: false
                 },
                 /**
-                 * Atribute to loader status of the component. 
+                 * Atribute to loader status of the component.
                  * Can be one of `on|off|disabled`. Will disable (disabled) or hide (off) load button.
                  * @type {String}
                  */
@@ -408,7 +388,7 @@ The comment input can be disabled by setting the `posting` attribute or property
                     reflectToAttribute: true
                 },
                 /**
-                 * Current authenticated user. 
+                 * Current authenticated user.
                  * @type {String}
                  */
                 user: {
@@ -507,7 +487,7 @@ The comment input can be disabled by setting the `posting` attribute or property
             */
             _retryButtonTapped() {
                 this.set('retryButton', 'hide');
-                this.dispatchEvent(new CustomEvent('post-comment', { 
+                this.dispatchEvent(new CustomEvent('post-comment', {
                     detail: {
                         value: this.comments[0].text,
                         retry: true
