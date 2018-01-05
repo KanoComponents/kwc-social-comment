@@ -167,7 +167,8 @@ The comment input can be disabled by setting the `posting` attribute or property
             .comment-body {
                 color: var(--color-black);
             }
-            .comment:hover .action.flag{
+            .comment:hover .action.delete,
+            .comment:hover .action.flag {
                 visibility: visible;
             }
             .author {
@@ -182,9 +183,15 @@ The comment input can be disabled by setting the `posting` attribute or property
                 flex: none;
                 width: calc(15% - 40px);
             }
+            .control-actions {
+                @apply --layout-horizontal;
+                @apply --layout-center;
+                @apply --layout-end-justified;
+            }
             .action:focus {
                 outline: 0;
             }
+            .action.delete,
             .action.flag {
                 -webkit-appearance: none;
                 background: transparent;
@@ -276,11 +283,20 @@ The comment input can be disabled by setting the `posting` attribute or property
                     </p>
                 </div>
                 <div class="actions">
-                    <button type="button"
-                            class$="[[_computeFlagClass(comment.flags.*)]]"
-                            on-tap="_flagButtonTapped">
-                        <iron-icon class="icon" icon="kwc-social-icons:flag"></iron-icon>
-                    </button>
+                    <div class="control-actions">
+                        <template is="dom-if" if="[[_commentIsDeletable(comment.author.id, user.id, user.admin_level)]]">
+                            <button type="button"
+                                    class="action delete"
+                                    on-tap="_deleteButtonTapped">
+                                <iron-icon class="icon" icon="kwc-ui-icons:rubbish-bin"></iron-icon>
+                            </button>
+                        </template>
+                        <button type="button"
+                                class$="[[_computeFlagClass(comment.flags.*)]]"
+                                on-tap="_flagButtonTapped">
+                            <iron-icon class="icon" icon="kwc-social-icons:flag"></iron-icon>
+                        </button>
+                    </div>
                     <kwc-button id="retry"
                             on-tap="_retryButtonTapped"
                             hidden$="[[!comment.error]]"
@@ -420,6 +436,18 @@ The comment input can be disabled by setting the `posting` attribute or property
             _createDate(formatted) {
                 return new Date(formatted);
             },
+            /**
+             * Compute whether a comment is deletable by the current user
+             * – either they must have written the comment, or they must be
+             * a Kano admin.
+             * @param {String} commentAuthorId
+             * @param {String} userId
+             * @param {Number} userAdminLevel
+             * @returns {Boolean}
+             */
+            _commentIsDeletable(commentAuthorId, userId, userAdminLevel) {
+                  return commentAuthorId === userId || userAdminLevel > 0;
+            },
             _computeFlag(flags) {
                 if (!flags || !this.user) {
                     return false;
@@ -447,6 +475,18 @@ The comment input can be disabled by setting the `posting` attribute or property
             },
             _computeErrorState(error) {
                 return error ? true : '';
+            },
+            /**
+             * Dispatch the event to delete a comment
+             * @param {Event} e
+             */
+            _deleteButtonTapped(e) {
+                this.dispatchEvent(new CustomEvent('delete-comment', {
+                    detail: {
+                        index: e.model.index,
+                        id: e.model.comment.id
+                    }
+                }));
             },
             _isHintHidden(e) {
                 return true;
