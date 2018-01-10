@@ -18,6 +18,7 @@
   },
   "resolutions": {
     "iron-icon": "^2.0.1",
-    "iron-iconset-svg": "^2.1.0"
+    "iron-iconset-svg": "^2.1.0",
+    "webcomponentsjs": "^v1.0.19"
   }
 }
