@@ -166,6 +166,11 @@ The comment input can be disabled by setting the `posting` attribute or property
             }
             .comment-body {
                 color: var(--color-black);
+                min-height: 20px;
+            }
+            .comment-error {
+                color: var(--color-cinnabar);
+                padding-top: 8px;
             }
             .comment:hover .action.delete,
             .comment:hover .action.flag {
@@ -281,6 +286,9 @@ The comment input can be disabled by setting the `posting` attribute or property
                     </p>
                     <p class="comment-body">
                         <span inner-h-t-m-l="[[_lb(comment.text)]]"></span>
+                    </p>
+                    <p class="comment-error" hidden$="[[!comment.error]]">
+                        [[comment.error]]
                     </p>
                 </div>
                 <div class="actions">
@@ -482,10 +490,14 @@ The comment input can be disabled by setting the `posting` attribute or property
              * @param {Event} e
              */
             _deleteButtonTapped(e) {
+                let commentId = e.model.comment.id;
+                if (!commentId) {
+                    return;
+                }
                 this.dispatchEvent(new CustomEvent('delete-comment', {
                     detail: {
                         index: e.model.index,
-                        id: e.model.comment.id
+                        id: commentId
                     }
                 }));
             },
@@ -542,6 +554,14 @@ The comment input can be disabled by setting the `posting` attribute or property
             */
             _submitComment(e) {
                 e.preventDefault();
+                /**
+                 * Prevent users trying to submit either blank comments, or,
+                 * equally annoying, lots of spaces.
+                 */
+                if (!this._comment || /^ *$/.test(this._comment)) {
+                    return;
+                }
+                this.retryButton = null;
                 this.dispatchEvent(new CustomEvent('post-comment', {
                     detail: {
                         value: this._comment
