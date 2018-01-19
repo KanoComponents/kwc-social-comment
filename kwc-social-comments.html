@@ -128,6 +128,9 @@ The comment input can be disabled by setting the `posting` attribute or property
                 border-color: var(--color-azure);
                 outline: 0;
             }
+            .comment-form-actions {
+                padding: 16px 0 0 0;
+            }
             .comment {
                 @apply --layout-horizontal;
                 @apply --layout-start;
@@ -241,10 +244,30 @@ The comment input can be disabled by setting the `posting` attribute or property
                 background-color: var(--color-porcelain);
                 color: rgba(41, 47, 53, 1);
             }
-            kwc-button[hidden] {
+            :host([retry-button="hide"]) #retry {
                 display: none;
             }
-            :host([retry-button="hide"]) #retry {
+            @media all and (max-width: 360px) {
+                .comment-form-actions {
+                    @apply --layout-vertical;
+                    @apply --layout-start;
+                    @apply --layout-start-justified;
+                }
+                .comment-form-actions kwc-button ~ kwc-button {
+                    margin: 8px 0 0 0;
+                }
+            }
+            @media all and (min-width: 361px) {
+                .comment-form-actions {
+                    @apply --layout-horizontal;
+                    @apply --layout-center;
+                    @apply --layout-start-justified;
+                }
+                .comment-form-actions kwc-button ~ kwc-button {
+                    margin: 0 0 0 8px;
+                }
+            }
+            :host *[hidden] {
                 display: none;
             }
         </style>
@@ -257,11 +280,31 @@ The comment input can be disabled by setting the `posting` attribute or property
                             </iron-image>
             </div>
             <form class="comment-form" on-submit="_submitComment">
-                <input class="comment-box"
-                       type="text"
-                       placeholder$="[[_placeholderText]]"
-                       value="{{_comment::input}}"
-                       disabled$="[[posting]]"/>
+                <input id="comment-input"
+                    class="comment-box"
+                    type="text"
+                    placeholder$="[[_placeholderText]]"
+                    value="{{_comment::input}}"
+                    disabled$="[[posting]]"
+                    on-focus="_toggleFormControls" />
+                <div class="comment-form-actions" hidden$="[[!_displayFormActions]]">
+                    <kwc-button
+                        disabled="[[!_commentValid]]"
+                        size="small"
+                        square
+                        type="submit"
+                        on-tap="_submitComment">
+                        Submit
+                    </kwc-button>
+                    <kwc-button
+                        size="small"
+                        square
+                        type="button"
+                        variant="tertiary"
+                        on-tap="_cancelComment">
+                        Cancel
+                    </kwc-button>
+                </div>
             </form>
         </div>
         <template is="dom-repeat" items="[[comments]]" as="comment">
@@ -340,7 +383,16 @@ The comment input can be disabled by setting the `posting` attribute or property
                  * @type {String}
                  */
                 _comment: {
-                    type: String
+                    type: String,
+                    value: ''
+                },
+                /**
+                 * Whethe the `_comment` is valid
+                 * @type {Boolean}
+                 */
+                _commentValid: {
+                    type: Boolean,
+                    computed: '_commentIsValid(_comment)'
                 },
                  /**
                  * Array of comment objects to render
@@ -360,6 +412,15 @@ The comment input can be disabled by setting the `posting` attribute or property
                 defaultAvatar: {
                     type: String,
                     value: 'https://s3.amazonaws.com/kano-avatars/default-avatar.svg'
+                },
+                /**
+                 * Boolean toggle to show or hide the Submit and Cancel buttons
+                 * on the comment input
+                 * @type {Boolean}
+                 */
+                _displayFormActions: {
+                    type: Boolean,
+                    value: false
                 },
                 /**
                  * An identifier to this comment thread, to be used in the `post-comment` event.
@@ -421,6 +482,33 @@ The comment input can be disabled by setting the `posting` attribute or property
                         return {};
                     }
                 }
+            },
+            /**
+             * Reset the `_comment` back to an empty String and hide the form
+             * actions
+             */
+            _cancelComment() {
+                this._comment = '';
+                this._displayFormActions = false;
+            },
+            /** Show the Submit and Cancel buttons on the comment input */
+            _toggleFormControls(e) {
+                this._displayFormActions = true;
+            },
+            /**
+             * Decide whether the current comment is valid
+             * @param {String} comment
+             * @returns {Boolean}
+             */
+            _commentIsValid(comment) {
+                /**
+                 * Prevent users trying to submit either blank comments, or,
+                 * equally annoying, lots of spaces.
+                 */
+                if (!this._comment || /^ *$/.test(this._comment)) {
+                    return false;
+                }
+                return true;
             },
             _computeAvatar(user) {
                 if (user) {
@@ -554,20 +642,25 @@ The comment input can be disabled by setting the `posting` attribute or property
             */
             _submitComment(e) {
                 e.preventDefault();
-                /**
-                 * Prevent users trying to submit either blank comments, or,
-                 * equally annoying, lots of spaces.
-                 */
-                if (!this._comment || /^ *$/.test(this._comment)) {
-                    return;
-                }
-                this.retryButton = null;
-                this.dispatchEvent(new CustomEvent('post-comment', {
-                    detail: {
-                        value: this._comment
+                let input = this.$['comment-input'];
+                if (this._commentValid) {
+                    this.retryButton = null;
+                    /**
+                     * Hide the Submit and Cancel buttons and blur the input
+                     * so that the user has to reselect (and therfore show the
+                     * controls) if they want to submit another comment.
+                     */
+                    this._displayFormActions = false;
+                    if (input) {
+                        input.blur();
                     }
-                }));
-                this._comment = '';
+                    this.dispatchEvent(new CustomEvent('post-comment', {
+                        detail: {
+                            value: this._comment
+                        }
+                    }));
+                    this._comment = '';
+                }
             },
             _timeSince(date) {
                 let parsedDate = new Date(date),
