@@ -147,6 +147,12 @@ Polymer({
             .comment.posting {
                 opacity: 0.6;
             }
+            .break-line {
+                width: calc(100% - 20px);
+                height: 1px;
+                margin-left: 20px;
+                background-color: var(--color-stone);
+            }
             .content {
                 @apply --layout-flex-2;
                 font-size: 16px;
@@ -211,9 +217,9 @@ Polymer({
                 background: transparent;
                 border: 0;
                 border-radius: 3px;
-                color: var(--color-grey);
+                color: var(--color-stone);
                 cursor: pointer;
-                visibility: hidden;
+                /* visibility: hidden; */
             }
             .action.delete:hover,
             .action.flag:hover {
@@ -221,7 +227,6 @@ Polymer({
             }
             .action.flag.flagged {
                 color: var(--color-carnation);
-                cursor: default;
                 visibility: visible;
             }
             .action .icon {
@@ -295,6 +300,7 @@ Polymer({
             </form>
         </div>
         <template is="dom-repeat" items="[[comments]]" as="comment">
+            <div class="break-line"></div>
             <div id\$="[[comment.id]]" class\$="comment [[_computePostingClass(comment)]]">
                 <div class="comment-avatar">
                     <iron-image class="avatar" src\$="[[_computeAvatar(comment.author)]]" sizing="cover" preload="" fade="" on-tap="_userTapped">
@@ -323,7 +329,7 @@ Polymer({
                                 <iron-icon class="icon" icon="kwc-ui-icons:rubbish-bin"></iron-icon>
                             </button>
                         </template>
-                        <button type="button" class\$="[[_computeFlagClass(comment.flags.*)]]" on-tap="_flagButtonTapped">
+                        <button type="button" class\$="[[_computeFlagClass(comment.*)]]" on-tap="_flagButtonTapped">
                             <iron-icon class="icon" icon="kwc-social-icons:flag"></iron-icon>
                         </button>
                     </div>
@@ -341,118 +347,129 @@ Polymer({
   is: 'kwc-social-comments',
 
   properties: {
-      /**
+    /**
        * Computer value for avatar
        * @type {String}
        */
-      _avatar: {
-          type: String,
-          computed: '_computeAvatar(user)'
-      },
-      /**
+    _avatar: {
+      type: String,
+      computed: '_computeAvatar(user)'
+    },
+    /**
        * Current value for comment input
        * @type {String}
        */
-      _comment: {
-          type: String,
-          value: ''
-      },
-      /**
+    _comment: {
+      type: String,
+      value: ''
+    },
+    /**
        * Whethe the `_comment` is valid
        * @type {Boolean}
        */
-      _commentValid: {
-          type: Boolean,
-          computed: '_commentIsValid(_comment)'
-      },
-       /**
+    _commentValid: {
+      type: Boolean,
+      computed: '_commentIsValid(_comment)'
+    },
+    /**
        * Array of comment objects to render
        * @type {Array}
        */
-      comments: {
-          type: Array,
-          value: () => {
-              return [];
-          },
-          notify: true
+    comments: {
+      type: Array,
+      value: () => {
+        return [];
       },
-      /**
+      notify: true
+    },
+    /**
+       * Array of comment ids where user has flagged the specific comments
+       * @type {Array}
+       */
+    commentFlags: {
+      type: Array,
+      value: () => {
+        return [];
+      },
+      notify: true
+    },
+    /**
        * Default Avatar to use when not provided by comment or user data
        * @type {String}
        */
-      defaultAvatar: {
-          type: String,
-          value: 'https://s3.amazonaws.com/kano-avatars/default-avatar.svg'
-      },
-      /**
+    defaultAvatar: {
+      type: String,
+      value: 'https://s3.amazonaws.com/kano-avatars/default-avatar.svg'
+    },
+    /**
        * Boolean toggle to show or hide the Submit and Cancel buttons
        * on the comment input
        * @type {Boolean}
        */
-      _displayFormActions: {
-          type: Boolean,
-          value: false
-      },
-      /**
+    _displayFormActions: {
+      type: Boolean,
+      value: false
+    },
+    /**
        * An identifier to this comment thread, to be used in the `post-comment` event.
        * @type {String}
        */
-      itemId: {
-          type: String
-      },
-      /**
+    itemId: {
+      type: String
+    },
+    /**
        * Value of next page of comments if using pagination.
        * @type {Number}
        */
-      nextPage: {
-          type: Number,
-          value: 0,
-          observer: '_onDataLoad'
-      },
-      /**
+    nextPage: {
+      type: Number,
+      value: 0,
+      observer: '_onDataLoad'
+    },
+    /**
        * Text to use as placeholder. Computed on whether we have comments or not.
        * @type {String}
        */
-      _placeholderText: {
-          type: String,
-          computed: '_computePlaceholderText(comments)'
-      },
-      /**
+    _placeholderText: {
+      type: String,
+      computed: '_computePlaceholderText(comments)'
+    },
+    /**
        * Atribute to indicate a comment is being posted. Will disable input.
        * @type {Boolean}
        */
-      posting: {
-          type: Boolean,
-          value: false
-      },
-      /**
+    posting: {
+      type: Boolean,
+      value: false
+    },
+    /**
        * Atribute to loader status of the component.
        * Can be one of `on|off|disabled`. Will disable (disabled) or hide (off) load button.
        * @type {String}
        */
-      loaderStatus: {
-          type: String,
-          value: "off",
-          reflectToAttribute: true
-      },
-      /**
+    loaderStatus: {
+      type: String,
+      value: 'off',
+      reflectToAttribute: true
+    },
+    /**
        * Atribute used to hide the retry button once clicked.
        * @type {Boolean}
        */
-      retryButton: {
-          type: String,
-          reflectToAttribute: true
-      },
-      /**
+    retryButton: {
+      type: String,
+      reflectToAttribute: true
+    },
+    /**
        * Current authenticated user.
        * @type {String}
        */
-      user: {
-          type: Object,
-          value: () => {
-              return {};
-          }
+    user: {
+      type: Object,
+      value: () => {
+        return {};
       }
+    }
   },
 
   /**
@@ -460,13 +477,13 @@ Polymer({
    * actions
    */
   _cancelComment() {
-      this._comment = '';
-      this._displayFormActions = false;
+    this._comment = '';
+    this._displayFormActions = false;
   },
 
   /** Show the Submit and Cancel buttons on the comment input */
-  _toggleFormControls(e) {
-      this._displayFormActions = true;
+  _toggleFormControls() {
+    this._displayFormActions = true;
   },
 
   /**
@@ -474,42 +491,42 @@ Polymer({
    * @param {String} comment
    * @returns {Boolean}
    */
-  _commentIsValid(comment) {
-      /**
+  _commentIsValid() {
+    /**
        * Prevent users trying to submit either blank comments, or,
        * equally annoying, lots of spaces.
        */
-      if (!this._comment || /^ *$/.test(this._comment)) {
-          return false;
-      }
-      return true;
+    if (!this._comment || /^ *$/.test(this._comment)) {
+      return false;
+    }
+    return true;
   },
 
   _computeAvatar(user) {
-      if (user) {
-          return user.avatar || this.defaultAvatar;
-      }
-      return this.defaultAvatar;
+    if (user) {
+      return user.avatar || this.defaultAvatar;
+    }
+    return this.defaultAvatar;
   },
 
   _onDataLoad() {
-      this.$.loader.disabled = false;
+    this.$.loader.disabled = false;
   },
 
   _loadMoreData() {
-      if (!this.itemId || this.$.loader.disabled) {
-          return;
+    if (!this.itemId || this.$.loader.disabled) {
+      return;
+    }
+    this.$.loader.disabled = true;
+    this.dispatchEvent(new CustomEvent('load-comment', {
+      detail: {
+        id: this.itemId
       }
-      this.$.loader.disabled = true;
-      this.dispatchEvent(new CustomEvent('load-comment', {
-          detail: {
-              id: this.itemId
-          }
-      }));
+    }));
   },
 
   _createDate(formatted) {
-      return new Date(formatted);
+    return new Date(formatted);
   },
 
   /**
@@ -522,41 +539,56 @@ Polymer({
    * @returns {Boolean}
    */
   _commentIsDeletable(commentAuthorId, userId, userAdminLevel) {
-        return commentAuthorId === userId || userAdminLevel > 0;
+    return commentAuthorId === userId || userAdminLevel > 0;
   },
 
   _computeFlag(flags) {
-      if (!flags || !this.user) {
-          return false;
-      }
-      return flags.some(flag => {
-          return flag.author === this.user.id;
-      });
+    if (!flags || !this.user) {
+      return false;
+    }
+    return flags.some(flag => {
+      return flag.author === this.user.id;
+    });
+  },
+
+  _computeCommentFlag(comment) {
+    if (this.commentFlags.length === 0) {
+      return false;
+    }
+    return this.commentFlags.some(flag => {
+      return flag === comment.id;
+    });
   },
 
   _computeFlagClass(splice) {
-      let baseClass = 'action flag',
-          activeClass = this._computeFlag(splice.base) ? 'flagged' : 'unflagged';
-      return `${baseClass} ${activeClass}`;
+    const baseClass = 'action flag';
+    let activeClass;
+    if (splice.base.flags) {
+      activeClass = this._computeFlag(splice.base.flags) ? 'flagged' : 'unflagged';
+    } else {
+      activeClass = this._computeCommentFlag(splice.base) ? 'flagged' : 'unflagged';
+    }
+    return `${baseClass} ${activeClass}`;
+
   },
 
   _computePlaceholderText(comments) {
-      if (!comments || !comments.length) {
-          return 'Be the first to comment';
-      }
-      return 'Leave a comment';
+    if (!comments || !comments.length) {
+      return 'Be the first to comment';
+    }
+    return 'Leave a comment';
   },
 
   _computePostingClass(comment) {
-      return `${comment.posting ? 'posting' : ''}${comment.error ? 'error' : ''}`;
+    return `${comment.posting ? 'posting' : ''}${comment.error ? 'error' : ''}`;
   },
 
   _computeErrorClass(error) {
-      return error ? 'error' : '';
+    return error ? 'error' : '';
   },
 
   _computeErrorState(error) {
-      return error ? true : '';
+    return error ? true : '';
   },
 
   /**
@@ -564,26 +596,26 @@ Polymer({
    * @param {Event} e
    */
   _deleteButtonTapped(e) {
-      let commentId = e.model.comment.id;
-      if (!commentId) {
-          return;
+    const commentId = e.model.comment.id;
+    if (!commentId) {
+      return;
+    }
+    this.dispatchEvent(new CustomEvent('delete-comment', {
+      detail: {
+        index: e.model.index,
+        id: commentId
       }
-      this.dispatchEvent(new CustomEvent('delete-comment', {
-          detail: {
-              index: e.model.index,
-              id: commentId
-          }
-      }));
+    }));
   },
 
-  _isHintHidden(e) {
-      return true;
+  _isHintHidden() {
+    return true;
   },
 
   _lb(value) {
-      let safeDiv = document.createElement('div');
-      safeDiv.textContent = value;
-      return safeDiv.innerHTML.replace(/\n/g, '<br>');
+    const safeDiv = document.createElement('div');
+    safeDiv.textContent = value;
+    return safeDiv.innerHTML.replace(/\n/g, '<br>');
   },
 
   /**
@@ -594,18 +626,34 @@ Polymer({
   * @param {string} id Id of comment as given by comment object.
   */
   _flagButtonTapped(e) {
-      let index = e.model.index,
-          id = this.comments[index].id,
-          flaged = this._computeFlag(this.comments[index].flags);
-      if (flaged) {
-          return;
+    const index = e.model.index;
+    const id = this.comments[index].id;
+    let flagged;
+    if (this.comments[index].flags) {
+      flagged = this._computeFlag(this.comments[index].flags);
+      if (flagged) {
+        return;
       }
-      this.dispatchEvent(new CustomEvent('flag-comment', {
-          detail: {
-              index,
-              id
-          }
+    } else {
+      flagged = this._computeCommentFlag(this.comments[index]);
+    }
+    if (flagged) {
+      e.path[1].setAttribute('class', 'action flag unflagged');
+      this.dispatchEvent(new CustomEvent('unflag-comment', {
+        detail: {
+          index,
+          id
+        }
       }));
+      return;
+    }
+    e.path[1].setAttribute('class', 'action flag flagged');
+    this.dispatchEvent(new CustomEvent('flag-comment', {
+      detail: {
+        index,
+        id
+      }
+    }));
   },
 
   /**
@@ -616,13 +664,13 @@ Polymer({
   * @param {boolean} retry Flag to indicate the post is a retry.
   */
   _retryButtonTapped() {
-      this.set('retryButton', 'hide');
-      this.dispatchEvent(new CustomEvent('post-comment', {
-          detail: {
-              value: this.comments[0].text,
-              retry: true
-          }
-      }));
+    this.set('retryButton', 'hide');
+    this.dispatchEvent(new CustomEvent('post-comment', {
+      detail: {
+        value: this.comments[0].text,
+        retry: true
+      }
+    }));
   },
 
   /**
@@ -632,52 +680,52 @@ Polymer({
   * @param {string} value Comment text.
   */
   _submitComment(e) {
-      e.preventDefault();
-      let input = this.$['comment-input'];
-      if (this._commentValid) {
-          this.retryButton = null;
-          /**
+    e.preventDefault();
+    const input = this.$['comment-input'];
+    if (this._commentValid) {
+      this.retryButton = null;
+      /**
            * Hide the Submit and Cancel buttons and blur the input
            * so that the user has to reselect (and therfore show the
            * controls) if they want to submit another comment.
            */
-          this._displayFormActions = false;
-          if (input) {
-              input.blur();
-          }
-          this.dispatchEvent(new CustomEvent('post-comment', {
-              detail: {
-                  value: this._comment
-              }
-          }));
-          this._comment = '';
+      this._displayFormActions = false;
+      if (input) {
+        input.blur();
       }
+      this.dispatchEvent(new CustomEvent('post-comment', {
+        detail: {
+          value: this._comment
+        }
+      }));
+      this._comment = '';
+    }
   },
 
   _timeSince(date) {
-      let parsedDate = new Date(date),
-          seconds = Math.floor((new Date() - parsedDate) / 1000),
-          interval = Math.floor(seconds / 31536000);
-      if (interval > 1) {
-          return interval + ' years';
-      }
-      interval = Math.floor(seconds / 2592000);
-      if (interval > 1) {
-          return interval + ' months';
-      }
-      interval = Math.floor(seconds / 86400);
-      if (interval > 1) {
-          return interval + ' days';
-      }
-      interval = Math.floor(seconds / 3600);
-      if (interval > 1) {
-          return interval + ' hours';
-      }
-      interval = Math.floor(seconds / 60);
-      if (interval > 1) {
-          return interval + ' minutes';
-      }
-      return Math.floor(seconds) + ' seconds';
+    const parsedDate = new Date(date);
+    const seconds = Math.floor((new Date() - parsedDate) / 1000);
+    let interval = Math.floor(seconds / 31536000);
+    if (interval > 1) {
+      return interval + ' years';
+    }
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) {
+      return interval + ' months';
+    }
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) {
+      return interval + ' days';
+    }
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) {
+      return interval + ' hours';
+    }
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) {
+      return interval + ' minutes';
+    }
+    return Math.floor(seconds) + ' seconds';
   },
 
   /**
@@ -687,15 +735,15 @@ Polymer({
   * @param {string} id provided by the `comment.author.id` property.
   */
   _userTapped(e) {
-      let index = e.model.index,
-          author = this.comments[index].author;
-      if (author) {
-          this.dispatchEvent(new CustomEvent('view-user', {
-              detail: {
-                  id: author.id,
-                  username: author.username
-              }
-          }));
-      }
+    const index = e.model.index;
+    const author = this.comments[index].author;
+    if (author) {
+      this.dispatchEvent(new CustomEvent('view-user', {
+        detail: {
+          id: author.id,
+          username: author.username
+        }
+      }));
+    }
   }
 });
