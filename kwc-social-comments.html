@@ -141,6 +141,12 @@ The comment input can be disabled by setting the `posting` attribute or property
             .comment.posting {
                 opacity: 0.6;
             }
+            .break-line {
+                width: calc(100% - 20px);
+                height: 1px;
+                margin-left: 20px;
+                background-color: var(--color-stone);
+            }
             .content {
                 @apply --layout-flex-2;
                 font-size: 16px;
@@ -205,9 +211,9 @@ The comment input can be disabled by setting the `posting` attribute or property
                 background: transparent;
                 border: 0;
                 border-radius: 3px;
-                color: var(--color-grey);
+                color: var(--color-stone);
                 cursor: pointer;
-                visibility: hidden;
+                /* visibility: hidden; */
             }
             .action.delete:hover,
             .action.flag:hover {
@@ -215,7 +221,6 @@ The comment input can be disabled by setting the `posting` attribute or property
             }
             .action.flag.flagged {
                 color: var(--color-carnation);
-                cursor: default;
                 visibility: visible;
             }
             .action .icon {
@@ -308,19 +313,15 @@ The comment input can be disabled by setting the `posting` attribute or property
             </form>
         </div>
         <template is="dom-repeat" items="[[comments]]" as="comment">
-            <div id$="[[comment.id]]" class$="comment [[_computePostingClass(comment)]]">
+            <div class="break-line"></div>
+            <div id\$="[[comment.id]]" class\$="comment [[_computePostingClass(comment)]]">
                 <div class="comment-avatar">
-                    <iron-image class="avatar"
-                                src$="[[_computeAvatar(comment.author)]]"
-                                sizing="cover"
-                                preload fade
-                                on-tap="_userTapped">
+                    <iron-image class="avatar" src\$="[[_computeAvatar(comment.author)]]" sizing="cover" preload="" fade="" on-tap="_userTapped">
                                 </iron-image>
                 </div>
                 <div class="content">
                     <p class="comment-header">
-                        <span class="author"
-                              on-tap="_userTapped">
+                        <span class="author" on-tap="_userTapped">
                             {{comment.author.username}}
                         </span>
                         <span class="date">
@@ -330,39 +331,28 @@ The comment input can be disabled by setting the `posting` attribute or property
                     <p class="comment-body">
                         <span inner-h-t-m-l="[[_lb(comment.text)]]"></span>
                     </p>
-                    <p class="comment-error" hidden$="[[!comment.error]]">
+                    <p class="comment-error" hidden\$="[[!comment.error]]">
                         [[comment.error]]
                     </p>
                 </div>
                 <div class="actions">
                     <div class="control-actions">
                         <template is="dom-if" if="[[_commentIsDeletable(comment.author.id, user.id, user.admin_level)]]">
-                            <button type="button"
-                                    class="action delete"
-                                    on-tap="_deleteButtonTapped">
+                            <button type="button" class="action delete" on-tap="_deleteButtonTapped">
                                 <iron-icon class="icon" icon="kwc-ui-icons:rubbish-bin"></iron-icon>
                             </button>
                         </template>
-                        <button type="button"
-                                class$="[[_computeFlagClass(comment.flags.*)]]"
-                                on-tap="_flagButtonTapped">
+                        <button type="button" class\$="[[_computeFlagClass(comment.*)]]" on-tap="_flagButtonTapped">
                             <iron-icon class="icon" icon="kwc-social-icons:flag"></iron-icon>
                         </button>
                     </div>
-                    <kwc-button id="retry"
-                            on-tap="_retryButtonTapped"
-                            hidden$="[[!comment.error]]"
-                            type="warning"
-                            transparent>
+                    <kwc-button id="retry" on-tap="_retryButtonTapped" hidden\$="[[!comment.error]]" type="warning" transparent="">
                         retry
                     </kwc-button>
                 </div>
             </div>
         </template>
-        <kwc-button class="loader"
-                    id="loader"
-                    type="secondary"
-                    on-tap="_loadMoreData">
+        <kwc-button class="loader" id="loader" type="secondary" on-tap="_loadMoreData">
             Load more
         </kwc-button>
     </template>
@@ -404,6 +394,17 @@ The comment input can be disabled by setting the `posting` attribute or property
                         return [];
                     },
                     notify: true
+                },
+                /**
+                * Array of comment ids where user has flagged the specific comments
+                * @type {Array}
+                */
+                commentFlags: {
+                    type: Array,
+                    value: () => {
+                      return [];
+                    },
+                    notify: true,
                 },
                 /**
                  * Default Avatar to use when not provided by comment or user data
@@ -553,10 +554,24 @@ The comment input can be disabled by setting the `posting` attribute or property
                     return flag.author === this.user.id;
                 });
             },
+            _computeCommentFlag(comment) {
+                if (this.commentFlags.length === 0) {
+                    return false;
+                }
+                return this.commentFlags.some(flag => {
+                    return flag === comment.id;
+                });
+            },
             _computeFlagClass(splice) {
                 let baseClass = 'action flag',
-                    activeClass = this._computeFlag(splice.base) ? 'flagged' : 'unflagged';
+                    activeClass;
+                if (splice.base.flags) {
+                    activeClass = this._computeFlag(splice.base.flags) ? 'flagged' : 'unflagged';
+                } else {
+                    activeClass = this._computeCommentFlag(splice.base) ? 'flagged' : 'unflagged';
+                }
                 return `${baseClass} ${activeClass}`;
+
             },
             _computePlaceholderText(comments) {
                 if (!comments || !comments.length) {
@@ -607,15 +622,31 @@ The comment input can be disabled by setting the `posting` attribute or property
             _flagButtonTapped(e) {
                 let index = e.model.index,
                     id = this.comments[index].id,
-                    flaged = this._computeFlag(this.comments[index].flags);
-                if (flaged) {
+                    flagged;
+                if (this.comments[index].flags) {
+                    flagged = this._computeFlag(this.comments[index].flags);
+                    if (flagged) {
+                        return;
+                    }
+                } else {
+                    flagged = this._computeCommentFlag(this.comments[index]);
+                }
+                if (flagged) {
+                    e.path[1].setAttribute('class', 'action flag unflagged');
+                    this.dispatchEvent(new CustomEvent('unflag-comment', {
+                        detail: {
+                            index,
+                            id,
+                        },
+                    }));
                     return;
                 }
+                e.path[1].setAttribute('class', 'action flag flagged');
                 this.dispatchEvent(new CustomEvent('flag-comment', {
                     detail: {
                         index,
-                        id
-                    }
+                        id,
+                    },
                 }));
             },
             /**
