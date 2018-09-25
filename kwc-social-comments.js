@@ -704,28 +704,33 @@ Polymer({
 
   _timeSince(date) {
     const parsedDate = new Date(date);
-    const seconds = Math.floor((new Date() - parsedDate) / 1000);
+    const seconds = Math.floor((new Date() - parsedDate) / 1000) + (new Date().getTimezoneOffset()/60 * 3600);
     let interval = Math.floor(seconds / 31536000);
-    if (interval > 1) {
-      return interval + ' years';
+    if (interval >= 1) {
+      return this.multipleCheck(interval, 'year');
     }
     interval = Math.floor(seconds / 2592000);
-    if (interval > 1) {
-      return interval + ' months';
+    if (interval >= 1) {
+      return this.multipleCheck(interval, 'month');
     }
     interval = Math.floor(seconds / 86400);
-    if (interval > 1) {
-      return interval + ' days';
+    if (interval >= 1) {
+      return this.multipleCheck(interval, 'day');
     }
     interval = Math.floor(seconds / 3600);
-    if (interval > 1) {
-      return interval + ' hours';
+    if (interval >= 1) {
+      return this.multipleCheck(interval, 'hour');
     }
     interval = Math.floor(seconds / 60);
-    if (interval > 1) {
-      return interval + ' minutes';
+    if (interval >= 1) {
+      return this.multipleCheck(interval, 'minute');
     }
     return Math.floor(seconds) + ' seconds';
+  },
+
+  multipleCheck(interval, unit) {
+    const baseDate = `${interval} ${unit}`;
+    return interval === 1 ? baseDate : `${baseDate}s`;
   },
 
   /**
