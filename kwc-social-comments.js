@@ -703,8 +703,8 @@ Polymer({
   },
 
   _timeSince(date) {
-    const parsedDate = new Date(date);
-    const seconds = Math.floor((new Date() - parsedDate) / 1000) + (new Date().getTimezoneOffset()/60 * 3600);
+    const parsedDate = new Date(Date.parse(date));
+    const seconds = Math.floor((new Date() - parsedDate) / 1000);
     let interval = Math.floor(seconds / 31536000);
     if (interval >= 1) {
       return this.multipleCheck(interval, 'year');
