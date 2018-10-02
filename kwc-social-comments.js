@@ -147,12 +147,6 @@ Polymer({
             .comment.posting {
                 opacity: 0.6;
             }
-            .break-line {
-                width: calc(100% - 20px);
-                height: 1px;
-                margin-left: 20px;
-                background-color: var(--color-stone);
-            }
             .content {
                 @apply --layout-flex-2;
                 font-size: 16px;
@@ -300,7 +294,6 @@ Polymer({
             </form>
         </div>
         <template is="dom-repeat" items="[[comments]]" as="comment">
-            <div class="break-line"></div>
             <div id\$="[[comment.id]]" class\$="comment [[_computePostingClass(comment)]]">
                 <div class="comment-avatar">
                     <iron-image class="avatar" src\$="[[_computeAvatar(comment.author)]]" sizing="cover" preload="" fade="" on-tap="_userTapped">
