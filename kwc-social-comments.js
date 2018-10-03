@@ -90,7 +90,7 @@ Polymer({
             }
             .input-comment {
                 @apply --layout-horizontal;
-                border-bottom: 1px solid var(--color-porcelain);
+                border-bottom: 1px solid #F6F7F9;
                 padding: 24px 0;
                 margin: 0;
                 width: 100%;
@@ -121,7 +121,7 @@ Polymer({
                 @apply --layout-flex-2;
             }
             .comment-box {
-                border: 1px solid var(--color-porcelain);
+                border: 1px solid #F6F7F9;
                 border-radius: 3px;
                 box-sizing: border-box;
                 font-family: var(--font-body);
@@ -140,7 +140,7 @@ Polymer({
             .comment {
                 @apply --layout-horizontal;
                 @apply --layout-start;
-                border-bottom: 1px solid var(--color-porcelain);
+                border-bottom: 1px solid #F6F7F9;
                 padding: 24px 0;
                 width: 100%;
             }
