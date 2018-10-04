@@ -288,7 +288,7 @@ Polymer({
                             </iron-image>
             </div>
             <form class="comment-form" on-submit="_submitComment">
-                <input id="comment-input" class="comment-box" type="text" placeholder\$="[[_placeholderText]]" value="{{_comment::input}}" disabled\$="[[posting]]" on-focus="_toggleFormControls">
+                <input id="comment-input" class="comment-box" type="text" placeholder\$="[[_placeholderText]]" value="{{_comment::input}}" disabled\$="[[posting]]" on-focus="_toggleFormControls" on-keydown="_dialogKeydown">
                 <div class="comment-form-actions" hidden\$="[[!_displayFormActions]]">
                     <kwc-button disabled="[[!_commentValid]]" size="small" square="" type="submit" on-tap="_submitComment">
                         Submit
@@ -469,6 +469,12 @@ Polymer({
       value: () => {
         return {};
       }
+    }
+  },
+
+  _dialogKeydown(e) {
+    if (e.keyCode === 8) {
+      e.stopPropagation();
     }
   },
 
