@@ -1,8 +1,19 @@
 #!groovy
 
+@Library('kanolib') _
+
 pipeline {
     agent {
         label 'ubuntu_18.04'
+    }
+    post {
+        always {
+            junit allowEmptyResults: true, testResults: 'test-results.xml'
+            step([$class: 'CheckStylePublisher', pattern: 'eslint.xml'])
+        }
+        regression {
+            notify_culprits currentBuild.result
+        }
     }
     stages {
         // pulls down locally the sources for the component
@@ -33,8 +44,14 @@ pipeline {
         stage('checkstyle') {
             steps {
                 script {
-                    sh "yarn checkstyle"
-                    step([$class: 'CheckStylePublisher', pattern: 'eslint.xml'])
+                    sh "yarn checkstyle-ci"
+                }
+            }
+        }
+        stage('test') {
+            steps {
+                script {
+                    sh "yarn test-ci"
                 }
             }
         }
