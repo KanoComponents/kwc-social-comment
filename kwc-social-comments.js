@@ -1,13 +1,16 @@
 /**
 `<kwc-social-comments>`
 
-Comment feed for use in social media flavoured components. Add this component somewhere in your html body, or more likely embed it into another comonent.
+Comment feed for use in social media flavoured components.
+Add this component somewhere in your html body, or more likely embed it into another component.
 
 ```html
     <body>
       <kwc-social-comments></kwc-social-comments>
 ```
-The component does not make any assumptions on how you are handling comment loading, or how they are stored by the api. Control of `loading` and `posting` states are done through attributes that can be set by any wrapper component.
+The component does not make any assumptions on how you are handling comment loading,
+or how they are stored by the api. Control of `loading` and `posting` states
+are done through attributes that can be set by any wrapper component.
 
 This component expects a list of comment objects of the following form:
 ```json
@@ -48,12 +51,17 @@ This component expects a list of comment objects of the following form:
 
 ## State attributes
 ### Loading
-This commponent can be put into a `loading` state by setting the `loaderState` property or `loader-state` attribute to `"disabled"`. This will disable the "load more" button until the state is reset to `"on"`.
+This commponent can be put into a `loading` state by setting the `loaderState` property
+or `loader-state` attribute to `"disabled"`.
+This will disable the "load more" button until the state is reset to `"on"`.
 
-If there are no more comments to load, the "load more" button can be hidden by setting the loader state to `"off"`.
+If there are no more comments to load,
+the "load more" button can be hidden by setting the loader state to `"off"`.
 
 ### Posting
-The comment input can be disabled by setting the `posting` attribute or property on the element to `true`. This can be used to prevent a user from posting a second comment whilst the first is still being sent, if this is a desired behaviour.
+The comment input can be disabled by setting the `posting` attribute or property on the element
+to `true`. This can be used to prevent a user from posting a second comment whilst the first
+is still being sent, if this is a desired behaviour.
 
 @demo demo/index.html
 */
@@ -73,6 +81,7 @@ import '@kano/kwc-button/kwc-button.js';
 import '@kano/kwc-style/kwc-style.js';
 import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
 import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+
 Polymer({
     _template: html`
         <style>
@@ -378,7 +387,7 @@ Polymer({
            */
         _avatar: {
             type: String,
-            computed: '_computeAvatar(user)'
+            computed: '_computeAvatar(user)',
         },
         /**
            * Current value for comment input
@@ -386,7 +395,7 @@ Polymer({
            */
         _comment: {
             type: String,
-            value: ''
+            value: '',
         },
         /**
            * Whethe the `_comment` is valid
@@ -394,7 +403,7 @@ Polymer({
            */
         _commentValid: {
             type: Boolean,
-            computed: '_commentIsValid(_comment)'
+            computed: '_commentIsValid(_comment)',
         },
         /**
            * Array of comment objects to render
@@ -402,10 +411,8 @@ Polymer({
            */
         comments: {
             type: Array,
-            value: () => {
-                return [];
-            },
-            notify: true
+            value: () => [],
+            notify: true,
         },
         /**
            * Array of comment ids where user has flagged the specific comments
@@ -413,10 +420,8 @@ Polymer({
            */
         commentFlags: {
             type: Array,
-            value: () => {
-                return [];
-            },
-            notify: true
+            value: () => [],
+            notify: true,
         },
         /**
            * Default Avatar to use when not provided by comment or user data
@@ -424,7 +429,7 @@ Polymer({
            */
         defaultAvatar: {
             type: String,
-            value: 'https://s3.amazonaws.com/kano-avatars/default-avatar.svg'
+            value: 'https://s3.amazonaws.com/kano-avatars/default-avatar.svg',
         },
         /**
            * Boolean toggle to show or hide the Submit and Cancel buttons
@@ -433,14 +438,14 @@ Polymer({
            */
         _displayFormActions: {
             type: Boolean,
-            value: false
+            value: false,
         },
         /**
            * An identifier to this comment thread, to be used in the `post-comment` event.
            * @type {String}
            */
         itemId: {
-            type: String
+            type: String,
         },
         /**
            * Value of next page of comments if using pagination.
@@ -449,7 +454,7 @@ Polymer({
         nextPage: {
             type: Number,
             value: 0,
-            observer: '_onDataLoad'
+            observer: '_onDataLoad',
         },
         /**
            * Text to use as placeholder. Computed on whether we have comments or not.
@@ -457,7 +462,7 @@ Polymer({
            */
         _placeholderText: {
             type: String,
-            computed: '_computePlaceholderText(comments)'
+            computed: '_computePlaceholderText(comments)',
         },
         /**
            * Atribute to indicate a comment is being posted. Will disable input.
@@ -465,7 +470,7 @@ Polymer({
            */
         posting: {
             type: Boolean,
-            value: false
+            value: false,
         },
         /**
            * Atribute to loader status of the component.
@@ -475,7 +480,7 @@ Polymer({
         loaderStatus: {
             type: String,
             value: 'off',
-            reflectToAttribute: true
+            reflectToAttribute: true,
         },
         /**
            * Atribute used to hide the retry button once clicked.
@@ -483,7 +488,7 @@ Polymer({
            */
         retryButton: {
             type: String,
-            reflectToAttribute: true
+            reflectToAttribute: true,
         },
         /**
            * Current authenticated user.
@@ -491,10 +496,8 @@ Polymer({
            */
         user: {
             type: Object,
-            value: () => {
-                return {};
-            }
-        }
+            value: () => ({}),
+        },
     },
 
     _dialogKeydown(e) {
@@ -551,8 +554,8 @@ Polymer({
         this.$.loader.disabled = true;
         this.dispatchEvent(new CustomEvent('load-comment', {
             detail: {
-                id: this.itemId
-            }
+                id: this.itemId,
+            },
         }));
     },
 
@@ -577,18 +580,14 @@ Polymer({
         if (!flags || !this.user) {
             return false;
         }
-        return flags.some(flag => {
-            return flag.author === this.user.id;
-        });
+        return flags.some(flag => flag.author === this.user.id);
     },
 
     _computeCommentFlag(comment) {
         if (this.commentFlags.length === 0) {
             return false;
         }
-        return this.commentFlags.some(flag => {
-            return flag === comment.id;
-        });
+        return this.commentFlags.some(flag => flag === comment.id);
     },
 
     _computeFlagClass(splice) {
@@ -600,7 +599,6 @@ Polymer({
             activeClass = this._computeCommentFlag(splice.base) ? 'flagged' : 'unflagged';
         }
         return `${baseClass} ${activeClass}`;
-
     },
 
     _computePlaceholderText(comments) {
@@ -634,8 +632,8 @@ Polymer({
         this.dispatchEvent(new CustomEvent('delete-comment', {
             detail: {
                 index: e.model.index,
-                id: commentId
-            }
+                id: commentId,
+            },
         }));
     },
 
@@ -657,8 +655,8 @@ Polymer({
     * @param {string} id Id of comment as given by comment object.
     */
     _flagButtonTapped(e) {
-        const index = e.model.index;
-        const id = this.comments[index].id;
+        const { index } = e.model;
+        const { id } = this.comments[index];
         let flagged;
         if (this.comments[index].flags) {
             flagged = this._computeFlag(this.comments[index].flags);
@@ -673,8 +671,8 @@ Polymer({
             this.dispatchEvent(new CustomEvent('unflag-comment', {
                 detail: {
                     index,
-                    id
-                }
+                    id,
+                },
             }));
             return;
         }
@@ -682,8 +680,8 @@ Polymer({
         this.dispatchEvent(new CustomEvent('flag-comment', {
             detail: {
                 index,
-                id
-            }
+                id,
+            },
         }));
     },
 
@@ -699,8 +697,8 @@ Polymer({
         this.dispatchEvent(new CustomEvent('post-comment', {
             detail: {
                 value: this.comments[0].text,
-                retry: true
-            }
+                retry: true,
+            },
         }));
     },
 
@@ -726,8 +724,8 @@ Polymer({
             }
             this.dispatchEvent(new CustomEvent('post-comment', {
                 detail: {
-                    value: this._comment
-                }
+                    value: this._comment,
+                },
             }));
             this._comment = '';
         }
@@ -756,7 +754,7 @@ Polymer({
         if (interval >= 1) {
             return this.multipleCheck(interval, 'minute');
         }
-        return Math.floor(seconds) + ' seconds';
+        return `${Math.floor(seconds)} seconds`;
     },
 
     multipleCheck(interval, unit) {
@@ -771,15 +769,15 @@ Polymer({
     * @param {string} id provided by the `comment.author.id` property.
     */
     _userTapped(e) {
-        const index = e.model.index;
-        const author = this.comments[index].author;
+        const { index } = e.model;
+        const { author } = this.comments[index];
         if (author) {
             this.dispatchEvent(new CustomEvent('view-user', {
                 detail: {
                     id: author.id,
-                    username: author.username
-                }
+                    username: author.username,
+                },
             }));
         }
-    }
+    },
 });

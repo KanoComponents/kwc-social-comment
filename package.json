@@ -9,19 +9,29 @@
     "type-detect": "1.0.0",
     "@webcomponents/webcomponentsjs": "2.0.0-beta.2"
   },
+  "scripts": {
+    "serve-test": "web-tester serve ./test",
+    "test": "web-tester run ./test",
+    "test-ci": "yarn run --silent test > test-results.xml",
+    "checkstyle": "eslint ./kwc-social-comments.js",
+    "checkstyle-ci": "yarn checkstyle -f checkstyle -o eslint.xml"
+  },
   "main": "kwc-social-comments.js",
   "dependencies": {
     "@kano/kwc-button": "^3.0.0-beta.3",
     "@kano/kwc-icons": "^3.0.0-beta.2",
     "@kano/kwc-style": "^3.0.0-beta.2",
     "@polymer/iron-autogrow-textarea": "^3.0.0-pre.18",
+    "@polymer/iron-flex-layout": "^3.0.1",
+    "@polymer/iron-icons": "^3.0.1",
     "@polymer/iron-image": "^3.0.0-pre.18",
     "@polymer/polymer": "^3.0.0"
   },
   "devDependencies": {
-    "@polymer/iron-component-page": "^3.0.0-pre.18",
-    "@polymer/iron-demo-helpers": "^3.0.0-pre.18",
+    "@kano/eslint-config": "^1.0.0",
+    "@kano/web-tester": "^1.0.0-alpha.3",
     "@webcomponents/webcomponentsjs": "^2.0.0",
-    "wct-browser-legacy": "^0.0.1-pre.11"
+    "eslint": "^4.19.1",
+    "eslint-plugin-import": "^2.14.0"
   }
 }
