@@ -51,6 +51,7 @@ pipeline {
         stage('test') {
             steps {
                 script {
+                    install_chrome_dependencies()
                     sh "yarn test-ci"
                 }
             }
